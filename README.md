@@ -30,6 +30,9 @@
 #### 4. 🧠 Dify 推理語言模型
 將上述三路資料聚合傳入 Dify。透過 Prompt Engineering 限制 GPT-5 的推理邊界。
 
+#### 5. 🤖 LINE Bot 訊息推播
+將 Dify 回傳的結構化 Markdown 文本，透過 Make 的 LINE Message API 模組，於每日早上 08:30 自動推播至使用者手機，確保在台股開盤 30 分鐘前提供高可讀性的精華選集。
+
 ---
 
 ### 📂 專案檔案結構說明 (Files)
@@ -58,3 +61,6 @@ stock-morning-report-line-bot
 1. 資料源網址對齊：請自行準備您習慣閱讀的財經媒體、證交所資訊之 RSS 網址或網頁 URL，並填入 Make 的 RSS 與 Jina AI 模組中。
 2. HTTP 模組連線：將 Make 的 HTTP 模組 URL 改為您個人的 Dify 工作流 API 路徑，並在 Headers 寫入 Authorization: Bearer app-您的Dify金鑰。
 3. LINE 觸發設定：開通您的 LINE 官方帳號 Messaging API，在 Make 內綁定 Channel Access Token，並在 To 欄位填入您本人的 LINE User ID 或群組 Group ID。
+
+#### 步驟 4：啟用 Make 自動排程
+將 Make 右上角的 Inactive 開關切換為 Active，並自行設定每天早上自動執行時間。
