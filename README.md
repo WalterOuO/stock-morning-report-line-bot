@@ -1,10 +1,10 @@
-# 🚀 台股盤前資訊自動化推播系統 (ETL + LLM Workflow + Line Bot)
+## 🚀 台股盤前資訊自動化推播系統 (ETL + LLM Workflow + Line Bot)
 
 本專案是一個兼具**高即時性、輕量化**的財經盤前策略自動化系統。每天早上 **08:15** 主動觸發，透過 **Make** 進行多源異質數據採集與資料清洗（ETL），並結合 **Dify Workflow (GPT-5)** 進行跨日金融資訊推理與文本提煉，最終在 **08:30** 前將 1000~2000 字的 Markdown 盤前策略日報主動推播至用戶的 **LINE**。
 
 ---
 
-## 🛠️ 系統架構圖 (Architecture)
+### 🛠️ 系統架構圖 (Architecture)
 
 ```text
 【來源 A：美股總經】 ──► RSS 擷取 ─► 時間與標題 Filter ─► Jina AI Reader ──► Text Aggregator ───┐
@@ -16,7 +16,7 @@
 
 ---
 
-## 📊 資料來源與工作流處理 (Data Sources & Pipeline)
+### 📊 資料來源與工作流處理 (Data Sources & Pipeline)
 
 #### 1. 🔴 來源 A：美股市況與總體經濟事件
 透過財經媒體 RSS 採集美股收盤後的核心大盤分析（如 Fed 官員談話、通膨數據、企業財報）。利用標題篩選器過濾垃圾資訊後，經由 Jina AI 將多篇文章整合為標準 Markdown 字串。
@@ -24,15 +24,15 @@
 #### 2. 🔵 來源 B：台股昨日盤後與籌碼
 透過 RSS 網頁蒐集台股前一天新聞，並過濾出《台股盤後》與《三大法人買賣超》相關資訊，並跨日蒐集當天早晨《台股盤前》報導，確保掌握最新資訊。
 
-### 3. 🟢 來源 C：日韓股開盤市況
+#### 3. 🟢 來源 C：日韓股開盤市況
 透過 Jina AI 讀取即時亞洲股市漲跌幅表格，並在 Target Selector（目標選擇器）鎖定日韓股表格內容，整合為 Markdown 表格結構。
 
-### 4. 🧠 Dify 推理語言模型
+#### 4. 🧠 Dify 推理語言模型
 將上述三路資料聚合傳入 Dify。透過 Prompt Engineering 限制 GPT-5 的推理邊界。
 
 ---
 
-## 📂 專案檔案結構說明 (Files)
+### 📂 專案檔案結構說明 (Files)
 ```text
 stock-morning-report-line-bot
 ├── README.md
@@ -43,7 +43,7 @@ stock-morning-report-line-bot
 
 ---
 
-## 🚀 部署使用指南 (How to Use)
+### 🚀 部署使用指南 (How to Use)
 
 #### 步驟 1：Dify LLM 設定
 1. 登入 Dify 後台，點擊「建立 App -> 匯入 DSL 檔案」。
