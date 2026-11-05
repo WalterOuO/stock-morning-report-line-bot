@@ -49,18 +49,18 @@ stock-morning-report-line-bot
 ### 🚀 部署使用指南 (How to Use)
 
 #### 步驟 1：Dify LLM 設定
-* 1. 登入 Dify 後台，點擊「建立 App -> 匯入 DSL 檔案」。
-* 2. 上傳本專案中的 workflows/dify_llm_agent.ifpkg。
-* 3. 發布工作流，並在「存取 API」選單中生成 app- 開頭的 API 金鑰（API Secret Key）。
+1. 登入 Dify 後台，點擊「建立 App -> 匯入 DSL 檔案」。
+2. 上傳本專案中的 workflows/dify_llm_agent.ifpkg。
+3. 發布工作流，並在「存取 API」選單中生成 app- 開頭的 API 金鑰（API Secret Key）。
 
 #### 步驟 2：Make 自動化管道部署
-* 1. 登入 Make 後台，建立新 Scenarios 並點擊右上角「... -> Import Blueprint」。
-* 2. 上傳本專案中的 workflows/make-etl-workflow.json。
+1. 登入 Make 後台，建立新 Scenarios 並點擊右上角「... -> Import Blueprint」。
+2. 上傳本專案中的 workflows/make-etl-workflow.json。
 
 #### 步驟 3：節點連線與認證設定
-* 1. 資料源網址對齊：請自行準備您習慣閱讀的財經媒體、證交所資訊之 RSS 網址或網頁 URL，並填入 Make 的 RSS 與 Jina AI 模組中。
-* 2. HTTP 模組連線：將 Make 的 HTTP 模組 URL 改為您個人的 Dify 工作流 API 路徑，並在 Headers 寫入 Authorization: Bearer app-您的Dify金鑰。
-* 3. LINE 觸發設定：開通您的 LINE 官方帳號 Messaging API，在 Make 內綁定 Channel Access Token，並在 To 欄位填入您本人的 LINE User ID 或群組 Group ID。
+1. 資料源網址對齊：請自行準備您習慣閱讀的財經媒體、證交所資訊之 RSS 網址或網頁 URL，並填入 Make 的 RSS 與 Jina AI 模組中。
+2. HTTP 模組連線：將 Make 的 HTTP 模組 URL 改為您個人的 Dify 工作流 API 路徑，並在 Headers 寫入 Authorization: Bearer app-您的Dify金鑰。
+3. LINE 觸發設定：開通您的 LINE 官方帳號 Messaging API，在 Make 內綁定 Channel Access Token，並在 To 欄位填入您本人的 LINE User ID 或群組 Group ID。
 
 #### 步驟 4：啟用 Make 自動排程
-* 將 Make 右上角的 Inactive 開關切換為 Active，並自行設定每天早上自動執行時間。
+將 Make 右上角的 Inactive 開關切換為 Active，並自行設定每天早上自動執行時間。
