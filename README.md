@@ -15,7 +15,7 @@
 
  鉅亨網 美股 RSS ─► 日期 + 標題 Filter ─► Jina Reader ─► 文字清洗 ×3 ────────┐
    (週二~週六 06:20)                                                 　　　 │
-                                                                      　　 ├─► Data store 　　　　(cnyes_articles)
+                                                                      　　 ├─► Data store 　　　(cnyes_articles)
  鉅亨網 台股 RSS ─► 日期 + 標題/關鍵字 Filter ─► Jina Reader ─► 文字清洗 ×3 ─┘
    (週一~週五 15:30)
 
@@ -23,7 +23,7 @@
 
  Data store (美股) ─► Text Aggregator ─► us_news ─┐
  Data store (台股) ─► Text Aggregator ─► tw_news ─┼─► HTTP POST：Dify Workflow ─► 成功才推播 ─► LINE
- Yahoo Finance 日經 / 韓股 ─► Compose ─► jpkr ────┘      (三個輸入變數、LLM 摘要)          (Messaging API)
+ Yahoo Finance 日經 / 韓股 ─► Compose ─► jpkr ────┘ 
 ```
 
 ---
@@ -144,7 +144,7 @@ stock-morning-report-line-bot
 1. **Jina AI**：在兩個收集 scenario 的 Jina 模組建立 Connection，貼上你的 Jina API Key。
 2. **Dify HTTP 模組**：
    - URL 改為你的 Dify 工作流 API 路徑（例如 `https://api.dify.ai/v1/workflows/run`）。
-   - Headers 的 `Authorization` 填入 `Bearer app-你的Dify金鑰`（建議使用 Make 的 Keychain 管理）。
+   - Headers 的 `Authorization` 填入 `Bearer 你的Dify金鑰`（建議使用 Make 的 Keychain 管理）。
    - Body 使用步驟 2 建立的資料結構，`inputs` 對應 `us_news`、`tw_news`、`jpkr`。
 3. **LINE**：開通 LINE 官方帳號 Messaging API，在 Make 綁定 Channel Access Token，並在 `To` 欄位填入你本人的 LINE User ID 或群組 Group ID；該官方帳號需已加為好友。
 4. **資料來源與條件**：RSS 網址、日期門檻、標題與關鍵字條件可依你習慣的媒體調整。
