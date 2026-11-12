@@ -15,7 +15,7 @@
 
  鉅亨網 美股 RSS ─► 日期 + 標題 Filter ─► Jina Reader ─► 文字清洗 ×3 ────────┐
    (週二~週六 06:20)                                                 　　　 │
-                                                                      　　 ├─► Data store 　　　(cnyes_articles)
+                                                                      　　 ├─► Data store
  鉅亨網 台股 RSS ─► 日期 + 標題/關鍵字 Filter ─► Jina Reader ─► 文字清洗 ×3 ─┘
    (週一~週五 15:30)
 
