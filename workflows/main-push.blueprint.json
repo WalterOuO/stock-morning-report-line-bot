@@ -1,27 +1,43 @@
 {
-    "name": "盤前日報",
+    "name": "推播系統主scenario",
     "flow": [
         {
             "id": 1,
-            "module": "rss:ActionReadArticles",
-            "version": 4,
+            "module": "datastore:SearchRecord",
+            "version": 1,
             "parameters": {
-                "include": []
+                "limit": 1,
+                "datastore": 196802,
+                "continueWhenNoRes": true
             },
             "mapper": {
-                "url": "https://news.cnyes.com/rss/v1/news/category/wd_stock",
-                "gzip": true,
-                "password": "",
-                "username": "",
-                "maxResults": "50",
-                "filterDateTo": "",
-                "filterDateFrom": ""
+                "sort": [
+                    {
+                        "key": "pubdate",
+                        "order": -1
+                    }
+                ],
+                "filter": [
+                    [
+                        {
+                            "a": "market",
+                            "b": "us",
+                            "o": "text:equal"
+                        },
+                        {
+                            "a": "pubdate",
+                            "b": "{{addDays(parseDate(formatDate(now; \"YYYY-MM-DD 04:00:00\"); \"YYYY-MM-DD HH:mm:ss\"; \"Asia/Taipei\"); if(parseNumber(formatDate(now; \"E\")) = 1; -2; 0))}}",
+                            "o": "number:greater"
+                        }
+                    ]
+                ],
+                "mappAbleLimit": ""
             },
             "metadata": {
                 "designer": {
                     "x": 0,
                     "y": 0,
-                    "name": "美股RSS"
+                    "name": "抓取美股資料"
                 },
                 "setupValidation": {
                     "result": {
@@ -29,515 +45,456 @@
                         "fields": []
                     },
                     "version": 1,
-                    "configuration": "c6935875481832bf"
+                    "configuration": "13713c7c505ce40b"
                 },
-                "restore": {},
-                "parameters": [
-                    {
-                        "name": "include",
-                        "type": "select",
-                        "label": "Process RSS fields",
-                        "multiple": true,
-                        "validate": {
-                            "enum": [
-                                "google-merchant-center",
-                                "itunes"
+                "restore": {
+                    "expect": {
+                        "sort": {
+                            "items": [
+                                {
+                                    "key": {
+                                        "mode": "chose",
+                                        "label": "pubdate"
+                                    },
+                                    "order": {
+                                        "mode": "chose",
+                                        "label": "Descending"
+                                    }
+                                }
                             ]
                         }
+                    },
+                    "parameters": {
+                        "datastore": {
+                            "label": "cnyes_articles"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "datastore",
+                        "type": "datastore",
+                        "label": "Data store",
+                        "required": true
+                    },
+                    {
+                        "name": "continueWhenNoRes",
+                        "type": "boolean",
+                        "label": "Continue the execution of the route even if the module returns no results"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "uinteger",
+                        "label": "Limit"
                     }
                 ],
                 "expect": [
                     {
-                        "name": "url",
-                        "type": "url",
-                        "label": "URL",
+                        "name": "filter",
+                        "type": "filter",
+                        "label": "Filter",
+                        "options": {
+                            "store": [
+                                {
+                                    "label": "market",
+                                    "value": "market",
+                                    "filter": "text:*"
+                                },
+                                {
+                                    "label": "title",
+                                    "value": "title",
+                                    "filter": "text:*"
+                                },
+                                {
+                                    "label": "pubdate",
+                                    "value": "pubdate",
+                                    "filter": "date:*"
+                                },
+                                {
+                                    "label": "link",
+                                    "value": "link",
+                                    "filter": "text:*"
+                                },
+                                {
+                                    "label": "content",
+                                    "value": "content",
+                                    "filter": "text:*"
+                                }
+                            ],
+                            "operators": [
+                                {
+                                    "label": "Basic operators",
+                                    "options": [
+                                        {
+                                            "label": "Exists",
+                                            "value": "exist"
+                                        },
+                                        {
+                                            "label": "Does not exist",
+                                            "value": "notexist"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "Text operators",
+                                    "options": [
+                                        {
+                                            "label": "Equal to",
+                                            "value": "text:equal"
+                                        },
+                                        {
+                                            "label": "Equal to (case insensitive)",
+                                            "value": "text:equal:ci"
+                                        },
+                                        {
+                                            "label": "Not equal to",
+                                            "value": "text:notequal"
+                                        },
+                                        {
+                                            "label": "Not equal to (case insensitive)",
+                                            "value": "text:notequal:ci"
+                                        },
+                                        {
+                                            "label": "Contains",
+                                            "value": "text:contain"
+                                        },
+                                        {
+                                            "label": "Contains (case insensitive)",
+                                            "value": "text:contain:ci"
+                                        },
+                                        {
+                                            "label": "Does not contain",
+                                            "value": "text:notcontain"
+                                        },
+                                        {
+                                            "label": "Does not contain (case insensitive)",
+                                            "value": "text:notcontain:ci"
+                                        },
+                                        {
+                                            "label": "Starts with",
+                                            "value": "text:startwith"
+                                        },
+                                        {
+                                            "label": "Starts with (case insensitive)",
+                                            "value": "text:startwith:ci"
+                                        },
+                                        {
+                                            "label": "Does not start with",
+                                            "value": "text:notstartwith"
+                                        },
+                                        {
+                                            "label": "Does not start with (case insensitive)",
+                                            "value": "text:notstartwith:ci"
+                                        },
+                                        {
+                                            "label": "Ends with",
+                                            "value": "text:endwith"
+                                        },
+                                        {
+                                            "label": "Ends with (case insensitive)",
+                                            "value": "text:endwith:ci"
+                                        },
+                                        {
+                                            "label": "Does not end with",
+                                            "value": "text:notendwith"
+                                        },
+                                        {
+                                            "label": "Does not end with (case insensitive)",
+                                            "value": "text:notendwith:ci"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "Numeric operators",
+                                    "options": [
+                                        {
+                                            "label": "Equal to",
+                                            "value": "number:equal"
+                                        },
+                                        {
+                                            "label": "Not equal to",
+                                            "value": "number:notequal"
+                                        },
+                                        {
+                                            "label": "Greater than",
+                                            "value": "number:greater"
+                                        },
+                                        {
+                                            "label": "Less than",
+                                            "value": "number:less"
+                                        },
+                                        {
+                                            "label": "Greater than or equal to",
+                                            "value": "number:greaterorequal"
+                                        },
+                                        {
+                                            "label": "Less than or equal to",
+                                            "value": "number:lessorequal"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "Datetime operators",
+                                    "options": [
+                                        {
+                                            "label": "Equal to",
+                                            "value": "date:equal"
+                                        },
+                                        {
+                                            "label": "Not equal to",
+                                            "value": "date:notequal"
+                                        },
+                                        {
+                                            "label": "Later than",
+                                            "value": "date:greater"
+                                        },
+                                        {
+                                            "label": "Earlier than",
+                                            "value": "date:less"
+                                        },
+                                        {
+                                            "label": "Later than or equal to",
+                                            "value": "date:greaterorequal"
+                                        },
+                                        {
+                                            "label": "Earlier than or equal to",
+                                            "value": "date:lessorequal"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "Boolean operators",
+                                    "options": [
+                                        {
+                                            "label": "Equal to",
+                                            "value": "boolean:equal"
+                                        },
+                                        {
+                                            "label": "Not equal to",
+                                            "value": "boolean:notequal"
+                                        },
+                                        {
+                                            "label": "Is true",
+                                            "value": "boolean:istrue"
+                                        },
+                                        {
+                                            "label": "Is false",
+                                            "value": "boolean:isfalse"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "Array operators",
+                                    "options": [
+                                        {
+                                            "label": "Contains",
+                                            "value": "array:contain"
+                                        },
+                                        {
+                                            "label": "Contains (case insensitive)",
+                                            "value": "array:contain:ci"
+                                        },
+                                        {
+                                            "label": "Does not contain",
+                                            "value": "array:notcontain"
+                                        },
+                                        {
+                                            "label": "Does not contain (case insensitive)",
+                                            "value": "array:notcontain:ci"
+                                        },
+                                        {
+                                            "label": "Array length equal to",
+                                            "value": "array:equal"
+                                        },
+                                        {
+                                            "label": "Array length not equal to",
+                                            "value": "array:notequal"
+                                        },
+                                        {
+                                            "label": "Array length greater than",
+                                            "value": "array:greater"
+                                        },
+                                        {
+                                            "label": "Array length less than",
+                                            "value": "array:less"
+                                        },
+                                        {
+                                            "label": "Array length greater than or equal to",
+                                            "value": "array:greaterorequal"
+                                        },
+                                        {
+                                            "label": "Array length less than or equal to",
+                                            "value": "array:lessorequal"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
                         "required": true
                     },
                     {
-                        "name": "username",
-                        "type": "text",
-                        "label": "User name"
+                        "name": "sort",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "select",
+                                "label": "Key",
+                                "dynamic": true,
+                                "options": [],
+                                "required": true
+                            },
+                            {
+                                "name": "order",
+                                "type": "select",
+                                "label": "Order",
+                                "options": [
+                                    {
+                                        "label": "Ascending",
+                                        "value": 1
+                                    },
+                                    {
+                                        "label": "Descending",
+                                        "value": -1
+                                    }
+                                ],
+                                "required": true
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Sort"
                     },
                     {
-                        "name": "password",
-                        "type": "password",
-                        "label": "Password"
-                    },
-                    {
-                        "name": "filterDateFrom",
-                        "type": "date",
-                        "label": "Date from"
-                    },
-                    {
-                        "name": "filterDateTo",
-                        "type": "date",
-                        "label": "Date to "
-                    },
-                    {
-                        "name": "maxResults",
-                        "type": "number",
-                        "label": "Maximum number of returned items",
-                        "required": true
-                    },
-                    {
-                        "name": "gzip",
-                        "type": "boolean",
-                        "label": "Request compressed content",
-                        "required": true
+                        "name": "mappAbleLimit",
+                        "type": "uinteger",
+                        "label": "Mappable Limit"
                     }
                 ],
                 "interface": [
                     {
-                        "name": "title",
+                        "name": "key",
                         "type": "text",
-                        "label": "Title"
+                        "label": "Key"
                     },
                     {
-                        "name": "description",
-                        "type": "text",
-                        "label": "Description"
-                    },
-                    {
-                        "name": "summary",
-                        "type": "text",
-                        "label": "Summary"
-                    },
-                    {
-                        "name": "author",
-                        "type": "text",
-                        "label": "Author"
-                    },
-                    {
-                        "name": "url",
-                        "type": "url",
-                        "label": "URL"
-                    },
-                    {
-                        "name": "dateUpdated",
-                        "type": "date",
-                        "label": "Date updated"
-                    },
-                    {
-                        "name": "dateCreated",
-                        "type": "date",
-                        "label": "Date created"
-                    },
-                    {
-                        "name": "comments",
-                        "type": "url",
-                        "label": "Comments"
-                    },
-                    {
-                        "name": "image",
+                        "name": "data",
                         "spec": [
                             {
+                                "help": "",
+                                "name": "market",
+                                "type": "text",
+                                "label": null,
+                                "default": null,
+                                "required": true,
+                                "multiline": false
+                            },
+                            {
+                                "help": "",
                                 "name": "title",
                                 "type": "text",
-                                "label": "Name"
+                                "label": null,
+                                "default": null,
+                                "required": true,
+                                "multiline": false
                             },
                             {
-                                "name": "url",
-                                "type": "url",
-                                "label": "URL"
-                            }
-                        ],
-                        "type": "collection",
-                        "label": "Image"
-                    },
-                    {
-                        "name": "categories",
-                        "spec": {
-                            "type": "text"
-                        },
-                        "type": "array",
-                        "label": "Categories"
-                    },
-                    {
-                        "name": "source",
-                        "spec": [
-                            {
-                                "name": "title",
-                                "type": "text",
-                                "label": "Name"
+                                "help": "",
+                                "name": "pubdate",
+                                "type": "date",
+                                "label": null,
+                                "required": true
                             },
                             {
-                                "name": "url",
-                                "type": "url",
-                                "label": "URL"
-                            }
-                        ],
-                        "type": "collection",
-                        "label": "Source"
-                    },
-                    {
-                        "name": "enclosures",
-                        "spec": [
-                            {
-                                "name": "url",
-                                "type": "url",
-                                "label": "URL"
-                            },
-                            {
-                                "name": "type",
-                                "type": "text",
-                                "label": "Type"
-                            },
-                            {
-                                "name": "length",
-                                "type": "number",
-                                "label": "Length"
-                            }
-                        ],
-                        "type": "array",
-                        "label": "Enclosures"
-                    },
-                    {
-                        "help": "Other RSS fields. All values are in text format.",
-                        "name": "rssFields",
-                        "spec": [
-                            {
-                                "name": "title",
-                                "type": "text",
-                                "label": "title"
-                            },
-                            {
-                                "name": "category",
-                                "type": "text",
-                                "label": "category"
-                            },
-                            {
+                                "help": "",
                                 "name": "link",
                                 "type": "text",
-                                "label": "link"
+                                "label": null,
+                                "default": null,
+                                "required": true,
+                                "multiline": false
                             },
                             {
-                                "name": "guid",
+                                "help": "",
+                                "name": "content",
                                 "type": "text",
-                                "label": "guid"
-                            },
-                            {
-                                "name": "description",
-                                "type": "text",
-                                "label": "description"
-                            },
-                            {
-                                "name": "pubdate",
-                                "type": "text",
-                                "label": "pubdate"
-                            },
-                            {
-                                "name": "media:thumbnail",
-                                "spec": [
-                                    {
-                                        "name": "props",
-                                        "spec": [
-                                            {
-                                                "name": "url",
-                                                "type": "text",
-                                                "label": "url"
-                                            },
-                                            {
-                                                "name": "height",
-                                                "type": "number",
-                                                "label": "height"
-                                            },
-                                            {
-                                                "name": "width",
-                                                "type": "number",
-                                                "label": "width"
-                                            },
-                                            {
-                                                "name": "caption",
-                                                "type": "text",
-                                                "label": "caption"
-                                            }
-                                        ],
-                                        "type": "collection",
-                                        "label": "Properties"
-                                    },
-                                    {
-                                        "name": "value",
-                                        "type": "text",
-                                        "label": "Value"
-                                    }
-                                ],
-                                "type": "collection",
-                                "label": "media:thumbnail"
-                            },
-                            {
-                                "name": "media:keywords",
-                                "spec": [
-                                    {
-                                        "name": "props",
-                                        "spec": [],
-                                        "type": "collection",
-                                        "label": "Properties"
-                                    },
-                                    {
-                                        "name": "value",
-                                        "type": "text",
-                                        "label": "Value"
-                                    }
-                                ],
-                                "type": "collection",
-                                "label": "media:keywords"
+                                "label": null,
+                                "default": null,
+                                "required": false,
+                                "multiline": false
                             }
                         ],
                         "type": "collection",
-                        "label": "RSS fields"
+                        "label": "Record"
                     }
                 ]
             }
         },
         {
             "id": 2,
-            "module": "jina-ai:readURL",
-            "version": 1,
-            "parameters": {
-                "__IMTCONN__": 12158238
-            },
-            "filter": {
-                "name": "Title filter",
-                "conditions": [
-                    [
-                        {
-                            "a": "{{1.rssFields.title}}",
-                            "b": "速報",
-                            "o": "text:notcontain"
-                        },
-                        {
-                            "a": "{{1.rssFields.title}}",
-                            "b": "美股盤後",
-                            "o": "text:contain"
-                        }
-                    ],
-                    [
-                        {
-                            "a": "{{1.rssFields.title}}",
-                            "b": "總經",
-                            "o": "text:contain"
-                        },
-                        {
-                            "a": "{{1.rssFields.title}}",
-                            "b": "重點摘要",
-                            "o": "text:contain"
-                        }
-                    ]
-                ]
-            },
-            "mapper": {
-                "url": "{{1.rssFields.link}}",
-                "X-Return-Format": "markdown"
-            },
-            "metadata": {
-                "designer": {
-                    "x": 300,
-                    "y": 0,
-                    "name": "抓美股盤後"
-                },
-                "setupValidation": {
-                    "result": {
-                        "valid": true,
-                        "fields": []
-                    },
-                    "version": 1,
-                    "configuration": "5946050d761f9627"
-                },
-                "restore": {
-                    "expect": {
-                        "Accept": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-Locale": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-No-Gfm": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-With-Iframe": {
-                            "mode": "chose"
-                        },
-                        "X-Retain-Images": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-Return-Format": {
-                            "mode": "chose",
-                            "label": "markdown"
-                        },
-                        "X-With-Shadow-Dom": {
-                            "mode": "chose"
-                        },
-                        "X-With-Links-Summary": {
-                            "mode": "chose"
-                        },
-                        "X-With-Images-Summary": {
-                            "mode": "chose"
-                        }
-                    },
-                    "parameters": {
-                        "__IMTCONN__": {
-                            "data": {
-                                "scoped": "true",
-                                "connection": "jina-ai"
-                            },
-                            "label": "VeryGood's jina.ai connection ([Usage 1] https://r.jina.ai/YOUR_URL\n[Usage 2] https://s.jina.ai/YOUR_SEARCH_QUERY\n[Homepage] https://jina.ai/reader\n\n[Authenticated as] 74c02bd6-9a2e-48dc-b13b-3571dea80671 (auto_ebe3ee1f-c70e-45c7-9d2a-e4bb80b6c76a)\n[Balance left] 10000000\n)"
-                        }
-                    }
-                },
-                "parameters": [
-                    {
-                        "name": "__IMTCONN__",
-                        "type": "account:jina-ai",
-                        "label": "Connection",
-                        "required": true
-                    }
-                ],
-                "expect": [
-                    {
-                        "name": "url",
-                        "type": "text",
-                        "label": "URL to Read",
-                        "required": true
-                    },
-                    {
-                        "name": "X-Return-Format",
-                        "type": "select",
-                        "label": "Content Format",
-                        "validate": {
-                            "enum": [
-                                "markdown",
-                                "html",
-                                "text",
-                                "screenshot",
-                                "pageshot"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-Timeout",
-                        "type": "text",
-                        "label": "Timeout"
-                    },
-                    {
-                        "name": "X-Target-Selector",
-                        "type": "text",
-                        "label": "Target Selector"
-                    },
-                    {
-                        "name": "X-Wait-For-Selector",
-                        "type": "text",
-                        "label": "Wait For Selector"
-                    },
-                    {
-                        "name": "X-Remove-Selector",
-                        "type": "text",
-                        "label": "Excluded Selector"
-                    },
-                    {
-                        "name": "X-Retain-Images",
-                        "type": "select",
-                        "label": "Remove All Images",
-                        "validate": {
-                            "enum": [
-                                "none"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-With-Links-Summary",
-                        "type": "boolean",
-                        "label": "Gather All Links At the End"
-                    },
-                    {
-                        "name": "X-With-Images-Summary",
-                        "type": "boolean",
-                        "label": "Gather All Images At the End"
-                    },
-                    {
-                        "name": "Accept",
-                        "type": "select",
-                        "label": "Accept Response",
-                        "validate": {
-                            "enum": [
-                                "application/json",
-                                "text/event-stream"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-Set-Cookie",
-                        "type": "text",
-                        "label": "Forward Cookie"
-                    },
-                    {
-                        "name": "X-With-Generated-Alt",
-                        "type": "text",
-                        "label": "Image Caption"
-                    },
-                    {
-                        "name": "X-Proxy-Url",
-                        "type": "url",
-                        "label": "Use a Proxy Server"
-                    },
-                    {
-                        "name": "X-No-Cache",
-                        "type": "text",
-                        "label": "Bypass the Cache"
-                    },
-                    {
-                        "name": "X-No-Gfm",
-                        "type": "select",
-                        "label": "Github Flavored Markdown",
-                        "validate": {
-                            "enum": [
-                                "table",
-                                "true"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-Locale",
-                        "type": "select",
-                        "label": "Browser Locale",
-                        "validate": {
-                            "enum": [
-                                "taben-USle"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-With-Iframe",
-                        "type": "boolean",
-                        "label": "Enable iframe Extraction"
-                    },
-                    {
-                        "name": "X-With-Shadow-Dom",
-                        "type": "boolean",
-                        "label": "Enable Shadow DOM Extraction"
-                    }
-                ]
-            }
-        },
-        {
-            "id": 3,
             "module": "util:TextAggregator",
             "version": 1,
             "parameters": {
                 "feeder": 1,
-                "rowSeparator": ""
+                "rowSeparator": "\n"
             },
             "mapper": {
-                "value": "---\n### 標題：{{1.title}}\n連結：{{if(1.url; 1.url; 1.link)}}\n\n{{get(2.body; \"content\")}}"
+                "value": "### 標題：{{1.data.title}}\n連結：{{1.data.link}}\n\n{{substring(1.data.content; 0; 8000)}}\n\n---"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 0
+                },
+                "restore": {
+                    "extra": {
+                        "feeder": {
+                            "label": "Data store - Search records [1]"
+                        }
+                    },
+                    "parameters": {
+                        "rowSeparator": {
+                            "label": "New row"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "id": 3,
+            "module": "datastore:SearchRecord",
+            "version": 1,
+            "parameters": {
+                "limit": 10,
+                "datastore": 196802,
+                "continueWhenNoRes": true
+            },
+            "mapper": {
+                "sort": [
+                    {
+                        "key": "pubdate",
+                        "order": -1
+                    }
+                ],
+                "filter": [
+                    [
+                        {
+                            "a": "market",
+                            "b": "tw",
+                            "o": "text:equal"
+                        },
+                        {
+                            "a": "pubdate",
+                            "b": "{{addDays(parseDate(formatDate(now; \"YYYY-MM-DD 13:30:00\"); \"YYYY-MM-DD HH:mm:ss\"; \"Asia/Taipei\"); if(parseNumber(formatDate(now; \"E\")) = 1; -3; -1))}}",
+                            "o": "number:greater"
+                        }
+                    ]
+                ],
+                "mappAbleLimit": ""
             },
             "metadata": {
                 "designer": {
                     "x": 600,
                     "y": 0,
-                    "name": "美股文件整合"
+                    "name": "抓取台股資料"
                 },
                 "setupValidation": {
                     "result": {
@@ -545,919 +502,572 @@
                         "fields": []
                     },
                     "version": 1,
-                    "configuration": "bf01f566ce730b98"
+                    "configuration": "35f4948bcb599f10"
                 },
                 "restore": {
-                    "extra": {
-                        "feeder": {
-                            "label": "RSS - Retrieve RSS feed items [1]"
+                    "expect": {
+                        "sort": {
+                            "items": [
+                                {
+                                    "key": {
+                                        "mode": "chose",
+                                        "label": "pubdate"
+                                    },
+                                    "order": {
+                                        "mode": "chose",
+                                        "label": "Descending"
+                                    }
+                                }
+                            ]
                         }
                     },
                     "parameters": {
-                        "rowSeparator": {
-                            "label": "Empty"
+                        "datastore": {
+                            "label": "cnyes_articles"
                         }
                     }
                 },
                 "parameters": [
                     {
-                        "name": "rowSeparator",
-                        "type": "select",
-                        "label": "Row separator",
-                        "validate": {
-                            "enum": [
-                                "\n",
-                                "\t",
-                                "other"
-                            ]
-                        }
+                        "name": "datastore",
+                        "type": "datastore",
+                        "label": "Data store",
+                        "required": true
+                    },
+                    {
+                        "name": "continueWhenNoRes",
+                        "type": "boolean",
+                        "label": "Continue the execution of the route even if the module returns no results"
+                    },
+                    {
+                        "name": "limit",
+                        "type": "uinteger",
+                        "label": "Limit"
                     }
                 ],
                 "expect": [
                     {
-                        "name": "value",
+                        "name": "filter",
+                        "type": "filter",
+                        "label": "Filter",
+                        "options": {
+                            "store": [
+                                {
+                                    "label": "market",
+                                    "value": "market",
+                                    "filter": "text:*"
+                                },
+                                {
+                                    "label": "title",
+                                    "value": "title",
+                                    "filter": "text:*"
+                                },
+                                {
+                                    "label": "pubdate",
+                                    "value": "pubdate",
+                                    "filter": "date:*"
+                                },
+                                {
+                                    "label": "link",
+                                    "value": "link",
+                                    "filter": "text:*"
+                                },
+                                {
+                                    "label": "content",
+                                    "value": "content",
+                                    "filter": "text:*"
+                                }
+                            ],
+                            "operators": [
+                                {
+                                    "label": "Basic operators",
+                                    "options": [
+                                        {
+                                            "label": "Exists",
+                                            "value": "exist"
+                                        },
+                                        {
+                                            "label": "Does not exist",
+                                            "value": "notexist"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "Text operators",
+                                    "options": [
+                                        {
+                                            "label": "Equal to",
+                                            "value": "text:equal"
+                                        },
+                                        {
+                                            "label": "Equal to (case insensitive)",
+                                            "value": "text:equal:ci"
+                                        },
+                                        {
+                                            "label": "Not equal to",
+                                            "value": "text:notequal"
+                                        },
+                                        {
+                                            "label": "Not equal to (case insensitive)",
+                                            "value": "text:notequal:ci"
+                                        },
+                                        {
+                                            "label": "Contains",
+                                            "value": "text:contain"
+                                        },
+                                        {
+                                            "label": "Contains (case insensitive)",
+                                            "value": "text:contain:ci"
+                                        },
+                                        {
+                                            "label": "Does not contain",
+                                            "value": "text:notcontain"
+                                        },
+                                        {
+                                            "label": "Does not contain (case insensitive)",
+                                            "value": "text:notcontain:ci"
+                                        },
+                                        {
+                                            "label": "Starts with",
+                                            "value": "text:startwith"
+                                        },
+                                        {
+                                            "label": "Starts with (case insensitive)",
+                                            "value": "text:startwith:ci"
+                                        },
+                                        {
+                                            "label": "Does not start with",
+                                            "value": "text:notstartwith"
+                                        },
+                                        {
+                                            "label": "Does not start with (case insensitive)",
+                                            "value": "text:notstartwith:ci"
+                                        },
+                                        {
+                                            "label": "Ends with",
+                                            "value": "text:endwith"
+                                        },
+                                        {
+                                            "label": "Ends with (case insensitive)",
+                                            "value": "text:endwith:ci"
+                                        },
+                                        {
+                                            "label": "Does not end with",
+                                            "value": "text:notendwith"
+                                        },
+                                        {
+                                            "label": "Does not end with (case insensitive)",
+                                            "value": "text:notendwith:ci"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "Numeric operators",
+                                    "options": [
+                                        {
+                                            "label": "Equal to",
+                                            "value": "number:equal"
+                                        },
+                                        {
+                                            "label": "Not equal to",
+                                            "value": "number:notequal"
+                                        },
+                                        {
+                                            "label": "Greater than",
+                                            "value": "number:greater"
+                                        },
+                                        {
+                                            "label": "Less than",
+                                            "value": "number:less"
+                                        },
+                                        {
+                                            "label": "Greater than or equal to",
+                                            "value": "number:greaterorequal"
+                                        },
+                                        {
+                                            "label": "Less than or equal to",
+                                            "value": "number:lessorequal"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "Datetime operators",
+                                    "options": [
+                                        {
+                                            "label": "Equal to",
+                                            "value": "date:equal"
+                                        },
+                                        {
+                                            "label": "Not equal to",
+                                            "value": "date:notequal"
+                                        },
+                                        {
+                                            "label": "Later than",
+                                            "value": "date:greater"
+                                        },
+                                        {
+                                            "label": "Earlier than",
+                                            "value": "date:less"
+                                        },
+                                        {
+                                            "label": "Later than or equal to",
+                                            "value": "date:greaterorequal"
+                                        },
+                                        {
+                                            "label": "Earlier than or equal to",
+                                            "value": "date:lessorequal"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "Boolean operators",
+                                    "options": [
+                                        {
+                                            "label": "Equal to",
+                                            "value": "boolean:equal"
+                                        },
+                                        {
+                                            "label": "Not equal to",
+                                            "value": "boolean:notequal"
+                                        },
+                                        {
+                                            "label": "Is true",
+                                            "value": "boolean:istrue"
+                                        },
+                                        {
+                                            "label": "Is false",
+                                            "value": "boolean:isfalse"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "Array operators",
+                                    "options": [
+                                        {
+                                            "label": "Contains",
+                                            "value": "array:contain"
+                                        },
+                                        {
+                                            "label": "Contains (case insensitive)",
+                                            "value": "array:contain:ci"
+                                        },
+                                        {
+                                            "label": "Does not contain",
+                                            "value": "array:notcontain"
+                                        },
+                                        {
+                                            "label": "Does not contain (case insensitive)",
+                                            "value": "array:notcontain:ci"
+                                        },
+                                        {
+                                            "label": "Array length equal to",
+                                            "value": "array:equal"
+                                        },
+                                        {
+                                            "label": "Array length not equal to",
+                                            "value": "array:notequal"
+                                        },
+                                        {
+                                            "label": "Array length greater than",
+                                            "value": "array:greater"
+                                        },
+                                        {
+                                            "label": "Array length less than",
+                                            "value": "array:less"
+                                        },
+                                        {
+                                            "label": "Array length greater than or equal to",
+                                            "value": "array:greaterorequal"
+                                        },
+                                        {
+                                            "label": "Array length less than or equal to",
+                                            "value": "array:lessorequal"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "required": true
+                    },
+                    {
+                        "name": "sort",
+                        "spec": [
+                            {
+                                "name": "key",
+                                "type": "select",
+                                "label": "Key",
+                                "dynamic": true,
+                                "options": [],
+                                "required": true
+                            },
+                            {
+                                "name": "order",
+                                "type": "select",
+                                "label": "Order",
+                                "options": [
+                                    {
+                                        "label": "Ascending",
+                                        "value": 1
+                                    },
+                                    {
+                                        "label": "Descending",
+                                        "value": -1
+                                    }
+                                ],
+                                "required": true
+                            }
+                        ],
+                        "type": "array",
+                        "label": "Sort"
+                    },
+                    {
+                        "name": "mappAbleLimit",
+                        "type": "uinteger",
+                        "label": "Mappable Limit"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "__IMTLENGTH__",
+                        "type": "uinteger",
+                        "label": "Total number of bundles"
+                    },
+                    {
+                        "name": "__IMTINDEX__",
+                        "type": "uinteger",
+                        "label": "Bundle order position"
+                    },
+                    {
+                        "name": "key",
                         "type": "text",
-                        "label": "Text"
+                        "label": "Key"
+                    },
+                    {
+                        "name": "data",
+                        "spec": [
+                            {
+                                "help": "",
+                                "name": "market",
+                                "type": "text",
+                                "label": null,
+                                "default": null,
+                                "required": true,
+                                "multiline": false
+                            },
+                            {
+                                "help": "",
+                                "name": "title",
+                                "type": "text",
+                                "label": null,
+                                "default": null,
+                                "required": true,
+                                "multiline": false
+                            },
+                            {
+                                "help": "",
+                                "name": "pubdate",
+                                "type": "date",
+                                "label": null,
+                                "required": true
+                            },
+                            {
+                                "help": "",
+                                "name": "link",
+                                "type": "text",
+                                "label": null,
+                                "default": null,
+                                "required": true,
+                                "multiline": false
+                            },
+                            {
+                                "help": "",
+                                "name": "content",
+                                "type": "text",
+                                "label": null,
+                                "default": null,
+                                "required": false,
+                                "multiline": false
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Record"
                     }
                 ]
             }
         },
         {
             "id": 4,
-            "module": "rss:ActionReadArticles",
-            "version": 4,
+            "module": "util:TextAggregator",
+            "version": 1,
             "parameters": {
-                "include": []
+                "feeder": 3,
+                "rowSeparator": "\n"
             },
             "mapper": {
-                "url": "https://news.cnyes.com/rss/v1/news/category/tw_stock",
-                "gzip": true,
-                "password": "",
-                "username": "",
-                "maxResults": "200",
-                "filterDateTo": "",
-                "filterDateFrom": ""
+                "value": "### 標題：{{3.data.title}}\n連結：{{3.data.link}}\n\n{{substring(3.data.content; 0; 4000)}}\n\n---"
             },
             "metadata": {
                 "designer": {
                     "x": 900,
-                    "y": 0,
-                    "name": "台股RSS"
-                },
-                "setupValidation": {
-                    "result": {
-                        "valid": true,
-                        "fields": []
-                    },
-                    "version": 1,
-                    "configuration": "f73e9627c84d68a0"
-                },
-                "restore": {},
-                "parameters": [
-                    {
-                        "name": "include",
-                        "type": "select",
-                        "label": "Process RSS fields",
-                        "multiple": true,
-                        "validate": {
-                            "enum": [
-                                "google-merchant-center",
-                                "itunes"
-                            ]
-                        }
-                    }
-                ],
-                "expect": [
-                    {
-                        "name": "url",
-                        "type": "url",
-                        "label": "URL",
-                        "required": true
-                    },
-                    {
-                        "name": "username",
-                        "type": "text",
-                        "label": "User name"
-                    },
-                    {
-                        "name": "password",
-                        "type": "password",
-                        "label": "Password"
-                    },
-                    {
-                        "name": "filterDateFrom",
-                        "type": "date",
-                        "label": "Date from"
-                    },
-                    {
-                        "name": "filterDateTo",
-                        "type": "date",
-                        "label": "Date to "
-                    },
-                    {
-                        "name": "maxResults",
-                        "type": "number",
-                        "label": "Maximum number of returned items",
-                        "required": true
-                    },
-                    {
-                        "name": "gzip",
-                        "type": "boolean",
-                        "label": "Request compressed content",
-                        "required": true
-                    }
-                ],
-                "interface": [
-                    {
-                        "name": "title",
-                        "type": "text",
-                        "label": "Title"
-                    },
-                    {
-                        "name": "description",
-                        "type": "text",
-                        "label": "Description"
-                    },
-                    {
-                        "name": "summary",
-                        "type": "text",
-                        "label": "Summary"
-                    },
-                    {
-                        "name": "author",
-                        "type": "text",
-                        "label": "Author"
-                    },
-                    {
-                        "name": "url",
-                        "type": "url",
-                        "label": "URL"
-                    },
-                    {
-                        "name": "dateUpdated",
-                        "type": "date",
-                        "label": "Date updated"
-                    },
-                    {
-                        "name": "dateCreated",
-                        "type": "date",
-                        "label": "Date created"
-                    },
-                    {
-                        "name": "comments",
-                        "type": "url",
-                        "label": "Comments"
-                    },
-                    {
-                        "name": "image",
-                        "spec": [
-                            {
-                                "name": "title",
-                                "type": "text",
-                                "label": "Name"
-                            },
-                            {
-                                "name": "url",
-                                "type": "url",
-                                "label": "URL"
-                            }
-                        ],
-                        "type": "collection",
-                        "label": "Image"
-                    },
-                    {
-                        "name": "categories",
-                        "spec": {
-                            "type": "text"
-                        },
-                        "type": "array",
-                        "label": "Categories"
-                    },
-                    {
-                        "name": "source",
-                        "spec": [
-                            {
-                                "name": "title",
-                                "type": "text",
-                                "label": "Name"
-                            },
-                            {
-                                "name": "url",
-                                "type": "url",
-                                "label": "URL"
-                            }
-                        ],
-                        "type": "collection",
-                        "label": "Source"
-                    },
-                    {
-                        "name": "enclosures",
-                        "spec": [
-                            {
-                                "name": "url",
-                                "type": "url",
-                                "label": "URL"
-                            },
-                            {
-                                "name": "type",
-                                "type": "text",
-                                "label": "Type"
-                            },
-                            {
-                                "name": "length",
-                                "type": "number",
-                                "label": "Length"
-                            }
-                        ],
-                        "type": "array",
-                        "label": "Enclosures"
-                    },
-                    {
-                        "help": "Other RSS fields. All values are in text format.",
-                        "name": "rssFields",
-                        "spec": [
-                            {
-                                "name": "title",
-                                "type": "text",
-                                "label": "title"
-                            },
-                            {
-                                "name": "category",
-                                "type": "text",
-                                "label": "category"
-                            },
-                            {
-                                "name": "link",
-                                "type": "text",
-                                "label": "link"
-                            },
-                            {
-                                "name": "guid",
-                                "type": "text",
-                                "label": "guid"
-                            },
-                            {
-                                "name": "description",
-                                "type": "text",
-                                "label": "description"
-                            },
-                            {
-                                "name": "pubdate",
-                                "type": "text",
-                                "label": "pubdate"
-                            },
-                            {
-                                "name": "media:thumbnail",
-                                "spec": [
-                                    {
-                                        "name": "props",
-                                        "spec": [
-                                            {
-                                                "name": "url",
-                                                "type": "text",
-                                                "label": "url"
-                                            },
-                                            {
-                                                "name": "height",
-                                                "type": "number",
-                                                "label": "height"
-                                            },
-                                            {
-                                                "name": "width",
-                                                "type": "number",
-                                                "label": "width"
-                                            },
-                                            {
-                                                "name": "caption",
-                                                "type": "text",
-                                                "label": "caption"
-                                            }
-                                        ],
-                                        "type": "collection",
-                                        "label": "Properties"
-                                    },
-                                    {
-                                        "name": "value",
-                                        "type": "text",
-                                        "label": "Value"
-                                    }
-                                ],
-                                "type": "collection",
-                                "label": "media:thumbnail"
-                            },
-                            {
-                                "name": "media:keywords",
-                                "spec": [
-                                    {
-                                        "name": "props",
-                                        "spec": [],
-                                        "type": "collection",
-                                        "label": "Properties"
-                                    },
-                                    {
-                                        "name": "value",
-                                        "type": "text",
-                                        "label": "Value"
-                                    }
-                                ],
-                                "type": "collection",
-                                "label": "media:keywords"
-                            }
-                        ],
-                        "type": "collection",
-                        "label": "RSS fields"
-                    }
-                ]
-            }
-        },
-        {
-            "id": 5,
-            "module": "jina-ai:readURL",
-            "version": 1,
-            "parameters": {
-                "__IMTCONN__": 12157441
-            },
-            "filter": {
-                "name": "Title filter",
-                "conditions": [
-                    [
-                        {
-                            "a": "{{4.rssFields.pubdate}}",
-                            "b": "{{addDays(parseDate(formatDate(now; \"YYYY-MM-DD 14:00:00\"); \"YYYY-MM-DD HH:mm:ss\"); -1)}}",
-                            "o": "date:greater"
-                        },
-                        {
-                            "a": "{{4.rssFields.title}}",
-                            "b": "台股盤後",
-                            "o": "text:contain"
-                        }
-                    ],
-                    [
-                        {
-                            "a": "{{4.rssFields.title}}",
-                            "b": "三大法人賣超",
-                            "o": "text:contain"
-                        }
-                    ],
-                    [
-                        {
-                            "a": "{{4.rssFields.title}}",
-                            "b": "三大法人買超",
-                            "o": "text:contain"
-                        }
-                    ],
-                    [
-                        {
-                            "a": "{{4.rssFields.title}}",
-                            "b": "台股盤前",
-                            "o": "text:contain"
-                        }
-                    ]
-                ]
-            },
-            "mapper": {
-                "url": "{{4.rssFields.link}}",
-                "X-Return-Format": "markdown"
-            },
-            "metadata": {
-                "designer": {
-                    "x": 1200,
-                    "y": 0,
-                    "name": "抓台股盤後盤前"
-                },
-                "setupValidation": {
-                    "result": {
-                        "valid": true,
-                        "fields": []
-                    },
-                    "version": 1,
-                    "configuration": "eb3b991164fa527d"
-                },
-                "restore": {
-                    "expect": {
-                        "Accept": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-Locale": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-No-Gfm": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-With-Iframe": {
-                            "mode": "chose"
-                        },
-                        "X-Retain-Images": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-Return-Format": {
-                            "mode": "chose",
-                            "label": "markdown"
-                        },
-                        "X-With-Shadow-Dom": {
-                            "mode": "chose"
-                        },
-                        "X-With-Links-Summary": {
-                            "mode": "chose"
-                        },
-                        "X-With-Images-Summary": {
-                            "mode": "chose"
-                        }
-                    },
-                    "parameters": {
-                        "__IMTCONN__": {
-                            "data": {
-                                "scoped": "true",
-                                "connection": "jina-ai"
-                            },
-                            "label": "VeryGood's jina.ai connection ([Usage 1] https://r.jina.ai/YOUR_URL\n[Usage 2] https://s.jina.ai/YOUR_SEARCH_QUERY\n[Homepage] https://jina.ai/reader\n\n[Authenticated as] 74c02bd6-9a2e-48dc-b13b-3571dea80671 (auto_ebe3ee1f-c70e-45c7-9d2a-e4bb80b6c76a)\n[Balance left] 10000000\n)"
-                        }
-                    }
-                },
-                "parameters": [
-                    {
-                        "name": "__IMTCONN__",
-                        "type": "account:jina-ai",
-                        "label": "Connection",
-                        "required": true
-                    }
-                ],
-                "expect": [
-                    {
-                        "name": "url",
-                        "type": "text",
-                        "label": "URL to Read",
-                        "required": true
-                    },
-                    {
-                        "name": "X-Return-Format",
-                        "type": "select",
-                        "label": "Content Format",
-                        "validate": {
-                            "enum": [
-                                "markdown",
-                                "html",
-                                "text",
-                                "screenshot",
-                                "pageshot"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-Timeout",
-                        "type": "text",
-                        "label": "Timeout"
-                    },
-                    {
-                        "name": "X-Target-Selector",
-                        "type": "text",
-                        "label": "Target Selector"
-                    },
-                    {
-                        "name": "X-Wait-For-Selector",
-                        "type": "text",
-                        "label": "Wait For Selector"
-                    },
-                    {
-                        "name": "X-Remove-Selector",
-                        "type": "text",
-                        "label": "Excluded Selector"
-                    },
-                    {
-                        "name": "X-Retain-Images",
-                        "type": "select",
-                        "label": "Remove All Images",
-                        "validate": {
-                            "enum": [
-                                "none"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-With-Links-Summary",
-                        "type": "boolean",
-                        "label": "Gather All Links At the End"
-                    },
-                    {
-                        "name": "X-With-Images-Summary",
-                        "type": "boolean",
-                        "label": "Gather All Images At the End"
-                    },
-                    {
-                        "name": "Accept",
-                        "type": "select",
-                        "label": "Accept Response",
-                        "validate": {
-                            "enum": [
-                                "application/json",
-                                "text/event-stream"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-Set-Cookie",
-                        "type": "text",
-                        "label": "Forward Cookie"
-                    },
-                    {
-                        "name": "X-With-Generated-Alt",
-                        "type": "text",
-                        "label": "Image Caption"
-                    },
-                    {
-                        "name": "X-Proxy-Url",
-                        "type": "url",
-                        "label": "Use a Proxy Server"
-                    },
-                    {
-                        "name": "X-No-Cache",
-                        "type": "text",
-                        "label": "Bypass the Cache"
-                    },
-                    {
-                        "name": "X-No-Gfm",
-                        "type": "select",
-                        "label": "Github Flavored Markdown",
-                        "validate": {
-                            "enum": [
-                                "table",
-                                "true"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-Locale",
-                        "type": "select",
-                        "label": "Browser Locale",
-                        "validate": {
-                            "enum": [
-                                "taben-USle"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-With-Iframe",
-                        "type": "boolean",
-                        "label": "Enable iframe Extraction"
-                    },
-                    {
-                        "name": "X-With-Shadow-Dom",
-                        "type": "boolean",
-                        "label": "Enable Shadow DOM Extraction"
-                    }
-                ]
-            }
-        },
-        {
-            "id": 6,
-            "module": "util:TextAggregator",
-            "version": 1,
-            "parameters": {
-                "feeder": 4,
-                "rowSeparator": ""
-            },
-            "mapper": {
-                "value": "---\r\n### 標題：{{4.title}}\r\n連結：{{if(4.url; 4.url; 4.link)}}\r\n\r\n{{get(5.body; \"content\")}}"
-            },
-            "metadata": {
-                "designer": {
-                    "x": 1500,
-                    "y": 0,
-                    "name": "台股文件整合"
-                },
-                "setupValidation": {
-                    "result": {
-                        "valid": true,
-                        "fields": []
-                    },
-                    "version": 1,
-                    "configuration": "f107cdf3854dd80b"
+                    "y": 0
                 },
                 "restore": {
                     "extra": {
                         "feeder": {
-                            "label": "RSS - Retrieve RSS feed items [4]"
+                            "label": "Data store - Search records [3]"
                         }
                     },
                     "parameters": {
                         "rowSeparator": {
-                            "label": "Empty"
+                            "label": "New row"
                         }
                     }
-                },
-                "parameters": [
+                }
+            }
+        },
+        {
+            "id": 6,
+            "module": "http:MakeRequest",
+            "version": 4,
+            "parameters": {
+                "authenticationType": "noAuth"
+            },
+            "mapper": {
+                "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EN225?interval=1m&range=1d",
+                "method": "get",
+                "headers": [
                     {
-                        "name": "rowSeparator",
-                        "type": "select",
-                        "label": "Row separator",
-                        "validate": {
-                            "enum": [
-                                "\n",
-                                "\t",
-                                "other"
-                            ]
-                        }
+                        "name": "User-Agent",
+                        "value": "Mozilla/5.0"
                     }
                 ],
+                "timeout": 40,
+                "shareCookies": false,
+                "parseResponse": true,
+                "allowRedirects": true,
+                "stopOnHttpError": true,
+                "requestCompressedContent": true
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1212,
+                    "y": 2,
+                    "name": "抓日經開盤"
+                }
+            }
+        },
+        {
+            "id": 7,
+            "module": "http:MakeRequest",
+            "version": 4,
+            "parameters": {
+                "authenticationType": "noAuth"
+            },
+            "mapper": {
+                "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EKS11?interval=1m&range=1d",
+                "method": "get",
+                "headers": [
+                    {
+                        "name": "User-Agent",
+                        "value": "Mozilla/5.0"
+                    }
+                ],
+                "timeout": 40,
+                "shareCookies": false,
+                "parseResponse": true,
+                "allowRedirects": true,
+                "stopOnHttpError": true,
+                "requestCompressedContent": true
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1512,
+                    "y": 2,
+                    "name": "抓韓股開盤"
+                }
+            }
+        },
+        {
+            "id": 8,
+            "module": "util:ComposeTransformer",
+            "version": 1,
+            "parameters": {},
+            "mapper": {
+                "value": "擷取時間：{{formatDate(now; \"YYYY/MM/DD HH:mm\")}}（台灣時間）\n\n日經225：開盤漲跌幅 {{formatNumber((6.data.chart.result[1].indicators.quote[1].open[1] - 6.data.chart.result[1].meta.chartPreviousClose) / 6.data.chart.result[1].meta.chartPreviousClose * 100; 2)}}%，目前漲跌幅 {{formatNumber((6.data.chart.result[1].meta.regularMarketPrice - 6.data.chart.result[1].meta.chartPreviousClose) / 6.data.chart.result[1].meta.chartPreviousClose * 100; 2)}}%\n\n韓國KOSPI：開盤漲跌幅 {{formatNumber((7.data.chart.result[1].indicators.quote[1].open[1] - 7.data.chart.result[1].meta.chartPreviousClose) / 7.data.chart.result[1].meta.chartPreviousClose * 100; 2)}}%，目前漲跌幅 {{formatNumber((7.data.chart.result[1].meta.regularMarketPrice - 7.data.chart.result[1].meta.chartPreviousClose) / 7.data.chart.result[1].meta.chartPreviousClose * 100; 2)}}%"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 1812,
+                    "y": 2
+                },
+                "setupValidation": {
+                    "result": {
+                        "valid": true,
+                        "fields": []
+                    },
+                    "version": 1,
+                    "configuration": "5777717c223f5333"
+                },
+                "restore": {},
                 "expect": [
                     {
                         "name": "value",
                         "type": "text",
                         "label": "Text"
-                    }
-                ]
-            }
-        },
-        {
-            "id": 8,
-            "module": "jina-ai:readURL",
-            "version": 1,
-            "parameters": {
-                "__IMTCONN__": 12157441
-            },
-            "mapper": {
-                "url": "https://www.wantgoo.com/global",
-                "X-Return-Format": "markdown",
-                "X-Target-Selector": "#index-asia"
-            },
-            "metadata": {
-                "designer": {
-                    "x": 1800,
-                    "y": 0,
-                    "name": "抓日韓股開盤"
-                },
-                "setupValidation": {
-                    "result": {
-                        "valid": true,
-                        "fields": []
-                    },
-                    "version": 1,
-                    "configuration": "2ede4b96d9574eb8"
-                },
-                "restore": {
-                    "expect": {
-                        "Accept": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-Locale": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-No-Gfm": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-With-Iframe": {
-                            "mode": "chose"
-                        },
-                        "X-Retain-Images": {
-                            "mode": "chose",
-                            "label": "Empty"
-                        },
-                        "X-Return-Format": {
-                            "mode": "chose",
-                            "label": "markdown"
-                        },
-                        "X-With-Shadow-Dom": {
-                            "mode": "chose"
-                        },
-                        "X-With-Links-Summary": {
-                            "mode": "chose"
-                        },
-                        "X-With-Images-Summary": {
-                            "mode": "chose"
-                        }
-                    },
-                    "parameters": {
-                        "__IMTCONN__": {
-                            "data": {
-                                "scoped": "true",
-                                "connection": "jina-ai"
-                            },
-                            "label": "VeryGood's jina.ai connection ([Usage 1] https://r.jina.ai/YOUR_URL\n[Usage 2] https://s.jina.ai/YOUR_SEARCH_QUERY\n[Homepage] https://jina.ai/reader\n\n[Authenticated as] 74c02bd6-9a2e-48dc-b13b-3571dea80671 (auto_ebe3ee1f-c70e-45c7-9d2a-e4bb80b6c76a)\n[Balance left] 10000000\n)"
-                        }
-                    }
-                },
-                "parameters": [
-                    {
-                        "name": "__IMTCONN__",
-                        "type": "account:jina-ai",
-                        "label": "Connection",
-                        "required": true
-                    }
-                ],
-                "expect": [
-                    {
-                        "name": "url",
-                        "type": "text",
-                        "label": "URL to Read",
-                        "required": true
-                    },
-                    {
-                        "name": "X-Return-Format",
-                        "type": "select",
-                        "label": "Content Format",
-                        "validate": {
-                            "enum": [
-                                "markdown",
-                                "html",
-                                "text",
-                                "screenshot",
-                                "pageshot"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-Timeout",
-                        "type": "text",
-                        "label": "Timeout"
-                    },
-                    {
-                        "name": "X-Target-Selector",
-                        "type": "text",
-                        "label": "Target Selector"
-                    },
-                    {
-                        "name": "X-Wait-For-Selector",
-                        "type": "text",
-                        "label": "Wait For Selector"
-                    },
-                    {
-                        "name": "X-Remove-Selector",
-                        "type": "text",
-                        "label": "Excluded Selector"
-                    },
-                    {
-                        "name": "X-Retain-Images",
-                        "type": "select",
-                        "label": "Remove All Images",
-                        "validate": {
-                            "enum": [
-                                "none"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-With-Links-Summary",
-                        "type": "boolean",
-                        "label": "Gather All Links At the End"
-                    },
-                    {
-                        "name": "X-With-Images-Summary",
-                        "type": "boolean",
-                        "label": "Gather All Images At the End"
-                    },
-                    {
-                        "name": "Accept",
-                        "type": "select",
-                        "label": "Accept Response",
-                        "validate": {
-                            "enum": [
-                                "application/json",
-                                "text/event-stream"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-Set-Cookie",
-                        "type": "text",
-                        "label": "Forward Cookie"
-                    },
-                    {
-                        "name": "X-With-Generated-Alt",
-                        "type": "text",
-                        "label": "Image Caption"
-                    },
-                    {
-                        "name": "X-Proxy-Url",
-                        "type": "url",
-                        "label": "Use a Proxy Server"
-                    },
-                    {
-                        "name": "X-No-Cache",
-                        "type": "text",
-                        "label": "Bypass the Cache"
-                    },
-                    {
-                        "name": "X-No-Gfm",
-                        "type": "select",
-                        "label": "Github Flavored Markdown",
-                        "validate": {
-                            "enum": [
-                                "table",
-                                "true"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-Locale",
-                        "type": "select",
-                        "label": "Browser Locale",
-                        "validate": {
-                            "enum": [
-                                "taben-USle"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "X-With-Iframe",
-                        "type": "boolean",
-                        "label": "Enable iframe Extraction"
-                    },
-                    {
-                        "name": "X-With-Shadow-Dom",
-                        "type": "boolean",
-                        "label": "Enable Shadow DOM Extraction"
                     }
                 ]
             }
         },
         {
             "id": 9,
-            "module": "util:ComposeTransformer",
-            "version": 1,
-            "parameters": {},
-            "mapper": {
-                "value": "# 每日盤前全球市場焦點原始數據日報 (08:15 採集)\r\n\r\n=========================================\r\n## 🔴 來源 A：美股與國際總經市場精華 (新聞內文合集)\r\n=========================================\r\n{{3.text}}\r\n\r\n=========================================\r\n## 🔵 來源 B：台股昨日盤後、籌碼與今日盤前大事 (新聞內文合集)\r\n=========================================\r\n{{6.text}}\r\n\r\n=========================================\r\n## 🟢 來源 C：日韓股市今日 08:00~08:15 開盤數據 (亞洲指數表格)\r\n=========================================\r\n{{get(8.body; \"content\")}}"
-            },
-            "metadata": {
-                "designer": {
-                    "x": 2100,
-                    "y": 0,
-                    "name": "all_news"
-                },
-                "setupValidation": {
-                    "version": 1,
-                    "configuration": "1ec184470e866c7b",
-                    "result": {
-                        "valid": true,
-                        "fields": []
-                    }
-                },
-                "restore": {},
-                "expect": [
-                    {
-                        "name": "value",
-                        "type": "text",
-                        "label": "Text"
-                    }
-                ]
-            }
-        },
-        {
-            "id": 10,
             "module": "http:MakeRequest",
             "version": 4,
             "parameters": {
-                "authenticationType": "noAuth",
-                "tlsType": ""
+                "tlsType": "",
+                "authenticationType": "noAuth"
             },
             "mapper": {
-                "url": "https://dify.ai",
+                "url": "https://api.dify.ai/v1/workflows/run",
                 "method": "post",
                 "headers": [
                     {
                         "name": "Authorization",
-                        "value": "Bearer app-aXzhRX6oGsn4Vpl84ObDQIbR"
+                        "value": "Bearer YOUR_DIFY_API_ACCESS_TOKEN"
                     }
                 ],
+                "timeout": "300",
                 "contentType": "json",
-                "parseResponse": true,
-                "stopOnHttpError": true,
-                "timeout": "40",
-                "allowRedirects": true,
+                "inputMethod": "dataStructure",
                 "shareCookies": false,
-                "requestCompressedContent": true,
-                "inputMethod": "jsonString",
-                "jsonStringBodyContent": "{\n  \"inputs\": {\n    \"all_news\": \"{{9.text}}\"\n  },\n  \"response_mode\": \"blocking\",\n  \"user\": \"make_automation_bot\"\n}"
+                "parseResponse": true,
+                "allowRedirects": true,
+                "stopOnHttpError": true,
+                "bodyDataStructure": 574486,
+                "dataStructureBodyContent": {
+                    "user": "make_automation_bot",
+                    "inputs": {
+                        "jpkr": "{{8.value}}",
+                        "tw_news": "{{4.text}}",
+                        "us_news": "{{2.text}}"
+                    },
+                    "response_mode": "blocking"
+                },
+                "requestCompressedContent": true
             },
             "metadata": {
                 "designer": {
-                    "x": 2400,
-                    "y": 0
+                    "x": 2112,
+                    "y": 2
                 },
                 "setupValidation": {
-                    "version": 1,
-                    "configuration": "b2441ad2453e973",
                     "result": {
                         "valid": true,
                         "fields": []
-                    }
+                    },
+                    "version": 1,
+                    "configuration": "d7f697d531399ee5"
                 },
                 "restore": {
-                    "parameters": {
-                        "authenticationType": {
-                            "label": "No authenticationUse when no credentials are required for the request."
-                        },
-                        "tlsType": {
-                            "label": "Empty"
-                        }
-                    },
                     "expect": {
                         "method": {
                             "mode": "chose",
@@ -1469,32 +1079,43 @@
                                 null
                             ]
                         },
-                        "queryParameters": {
-                            "mode": "chose"
-                        },
                         "contentType": {
                             "label": "application/jsonEnter data in the JSON format, as a string or using a data structure."
                         },
-                        "parseResponse": {
+                        "inputMethod": {
+                            "label": "Data structureDefine the JSON body with a data structure to map or enter values for each key. JSON reserved characters are escaped automatically."
+                        },
+                        "shareCookies": {
                             "mode": "chose"
                         },
-                        "stopOnHttpError": {
+                        "parseResponse": {
                             "mode": "chose"
                         },
                         "allowRedirects": {
                             "mode": "chose"
                         },
-                        "shareCookies": {
+                        "paginationType": {
+                            "label": "Empty"
+                        },
+                        "queryParameters": {
                             "mode": "chose"
+                        },
+                        "stopOnHttpError": {
+                            "mode": "chose"
+                        },
+                        "bodyDataStructure": {
+                            "label": "dify_workflow_run_body"
                         },
                         "requestCompressedContent": {
                             "mode": "chose"
-                        },
-                        "inputMethod": {
-                            "label": "JSON stringEnter the JSON body as a raw text string. If values contain JSON reserved characters, you must escape them manually."
-                        },
-                        "paginationType": {
+                        }
+                    },
+                    "parameters": {
+                        "tlsType": {
                             "label": "Empty"
+                        },
+                        "authenticationType": {
+                            "label": "No authenticationUse when no credentials are required for the request."
                         }
                     }
                 },
@@ -1558,17 +1179,13 @@
                     },
                     {
                         "name": "headers",
-                        "type": "array",
-                        "label": "Headers",
                         "spec": {
                             "name": "value",
-                            "label": "Header",
-                            "type": "collection",
                             "spec": [
                                 {
                                     "name": "name",
-                                    "label": "Name",
                                     "type": "text",
+                                    "label": "Name",
                                     "required": true,
                                     "validate": {
                                         "pattern": "^[-!#$%&'*+.^_`|~0-9A-Za-z]+$"
@@ -1576,34 +1193,38 @@
                                 },
                                 {
                                     "name": "value",
-                                    "label": "Value",
-                                    "type": "text"
+                                    "type": "text",
+                                    "label": "Value"
                                 }
-                            ]
-                        }
+                            ],
+                            "type": "collection",
+                            "label": "Header"
+                        },
+                        "type": "array",
+                        "label": "Headers"
                     },
                     {
                         "name": "queryParameters",
-                        "type": "array",
-                        "label": "Query parameters",
                         "spec": {
                             "name": "value",
-                            "label": "Parameter",
-                            "type": "collection",
                             "spec": [
                                 {
                                     "name": "name",
-                                    "label": "Name",
                                     "type": "text",
+                                    "label": "Name",
                                     "required": true
                                 },
                                 {
                                     "name": "value",
-                                    "label": "Value",
-                                    "type": "text"
+                                    "type": "text",
+                                    "label": "Value"
                                 }
-                            ]
-                        }
+                            ],
+                            "type": "collection",
+                            "label": "Parameter"
+                        },
+                        "type": "array",
+                        "label": "Query parameters"
                     },
                     {
                         "name": "contentType",
@@ -1635,8 +1256,8 @@
                         "type": "uinteger",
                         "label": "Timeout",
                         "validate": {
-                            "min": 1,
-                            "max": 300
+                            "max": 300,
+                            "min": 1
                         }
                     },
                     {
@@ -1670,10 +1291,43 @@
                         }
                     },
                     {
-                        "name": "jsonStringBodyContent",
-                        "type": "text",
-                        "label": "Body content",
+                        "name": "bodyDataStructure",
+                        "type": "udt",
+                        "label": "Body structure",
                         "required": true
+                    },
+                    {
+                        "name": "dataStructureBodyContent",
+                        "spec": [
+                            {
+                                "name": "inputs",
+                                "spec": [
+                                    {
+                                        "name": "us_news",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "tw_news",
+                                        "type": "text"
+                                    },
+                                    {
+                                        "name": "jpkr",
+                                        "type": "text"
+                                    }
+                                ],
+                                "type": "collection"
+                            },
+                            {
+                                "name": "response_mode",
+                                "type": "text"
+                            },
+                            {
+                                "name": "user",
+                                "type": "text"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Body content"
                     },
                     {
                         "name": "paginationType",
@@ -1692,97 +1346,100 @@
                 "interface": [
                     {
                         "name": "data",
-                        "label": "Data",
-                        "type": "any"
+                        "type": "any",
+                        "label": "Data"
                     },
                     {
                         "name": "statusCode",
-                        "label": "Status Code",
-                        "type": "number"
+                        "type": "number",
+                        "label": "Status Code"
                     },
                     {
                         "name": "headers",
-                        "label": "Headers",
-                        "type": "collection",
                         "spec": [
                             {
                                 "name": "content-length",
-                                "label": "Content-Length",
-                                "type": "text"
+                                "type": "text",
+                                "label": "Content-Length"
                             },
                             {
                                 "name": "content-encoding",
-                                "label": "Content-Encoding",
-                                "type": "text"
+                                "type": "text",
+                                "label": "Content-Encoding"
                             },
                             {
                                 "name": "content-type",
-                                "label": "Content-Type",
-                                "type": "text"
+                                "type": "text",
+                                "label": "Content-Type"
                             },
                             {
                                 "name": "server",
-                                "label": "Server",
-                                "type": "text"
+                                "type": "text",
+                                "label": "Server"
                             },
                             {
                                 "name": "cache-control",
-                                "label": "Cache-Control",
-                                "type": "text"
+                                "type": "text",
+                                "label": "Cache-Control"
                             },
                             {
                                 "name": "set-cookie",
-                                "label": "Set-Cookie",
-                                "type": "array",
                                 "spec": {
                                     "type": "text"
-                                }
+                                },
+                                "type": "array",
+                                "label": "Set-Cookie"
                             }
-                        ]
+                        ],
+                        "type": "collection",
+                        "label": "Headers"
                     }
                 ]
             }
         },
         {
-            "id": 11,
+            "id": 10,
             "module": "line:sendPushMessages",
             "version": 1,
             "parameters": {
                 "__IMTCONN__": 12159979
             },
+            "filter": {
+                "name": "Dify成功才推播",
+                "conditions": [
+                    [
+                        {
+                            "a": "{{9.data.data.status}}",
+                            "b": "succeeded",
+                            "o": "text:equal"
+                        }
+                    ]
+                ]
+            },
             "mapper": {
-                "to": "Uad5ac6ff89b5be050124ced3f8104c33",
+                "to": "YOUR_LINE_USER_ID",
                 "messages": [
                     {
-                        "type": "text",
-                        "text": "{{get(10.body; \"data.outputs.result\")}}"
+                        "text": "{{substring(9.data.data.outputs.result; 0; 4900)}}",
+                        "type": "text"
                     }
                 ],
                 "notificationDisabled": false
             },
             "metadata": {
                 "designer": {
-                    "x": 2700,
-                    "y": 0
+                    "x": 2412,
+                    "y": 2
                 },
                 "setupValidation": {
-                    "version": 1,
-                    "configuration": "c8e02e9c5e3f5b47",
                     "result": {
                         "valid": true,
                         "fields": []
-                    }
+                    },
+                    "version": 1,
+                    "configuration": "bd0687130245f65d"
                 },
                 "restore": {
-                    "parameters": {
-                        "__IMTCONN__": {
-                            "label": "VeryGood's LINE (Message API) connection",
-                            "data": {
-                                "scoped": "true",
-                                "connection": "line2"
-                            }
-                        }
-                    },
                     "expect": {
                         "messages": {
                             "mode": "chose",
@@ -1800,6 +1457,15 @@
                         },
                         "notificationDisabled": {
                             "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "line2"
+                            },
+                            "label": "YOUR's LINE (Message API) connection (YOUR_LINE)"
                         }
                     }
                 },
@@ -1820,12 +1486,6 @@
                     },
                     {
                         "name": "messages",
-                        "type": "array",
-                        "label": "Messages",
-                        "validate": {
-                            "maxItems": 5
-                        },
-                        "required": true,
                         "spec": [
                             {
                                 "name": "type",
@@ -2903,7 +2563,13 @@
                                 ],
                                 "required": true
                             }
-                        ]
+                        ],
+                        "type": "array",
+                        "label": "Messages",
+                        "required": true,
+                        "validate": {
+                            "maxItems": 5
+                        }
                     },
                     {
                         "name": "notificationDisabled",
