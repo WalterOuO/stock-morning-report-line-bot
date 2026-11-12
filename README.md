@@ -45,17 +45,17 @@
 #### 1. 🔴 美股盤後（收集 → Data store）
 - **來源**：鉅亨網美股 RSS（`news.cnyes.com/rss/v1/news/category/wd_stock`），每次取最多 100 則。
 - **篩選**：發布時間晚於**當天 04:00**，且標題包含「美股盤後」、不含「速報」。每天預期只會通過一篇。
-- **全文**：以 Jina AI Reader 取得 Markdown 全文。
+- **全文**：以 Jina AI Reader 取得 Markdown 全文
 - **文字清洗**（3 個 Text parser → Replace）：
-  1. 刪除第一個 `# ` 標題之前的所有網頁雜訊與按鈕。
-  2. 刪除整行以 `![Image` 開頭的圖片連結。
-  3. 刪除結尾標記「掌握全球財經資訊」及所有其他報導內容。
+  1. 刪除第一個 `# ` 標題之前的所有網頁雜訊與按鈕
+  2. 刪除整行以 `![Image` 開頭的圖片連結
+  3. 刪除結尾標記「掌握全球財經資訊」及所有其他報導內容
 - **寫入**：存進 Data store，以文章網址的 md5 雜湊值作為 key，重複收集時會覆蓋，不會產生重複資料。
 
 #### 2. 🔵 台股盤後與大盤法人籌碼（收集 → Data store）
-- **來源**：鉅亨網台股 RSS（`.../category/tw_stock`）。
-- **篩選**：發布時間晚於**當天 13:30**，且符合下列任一條件：
-  - 標題包含「台股盤後」（不含「速報」）；
+- **來源**：鉅亨網台股 RSS（`news.cnyes.com/rss/v1/news/category/tw_stock`）。
+- **篩選**：發布時間晚於**當天 13:30**，且符合下列**任一**條件：
+  - 標題包含「台股盤後」（不含「速報」）
   - `media:keywords` 同時包含「三大法人買賣超」與「台股盤後」，用來精準抓到大盤的三大法人買賣超報導，避開只談個股籌碼的文章。
 - 全文取得、文字清洗與寫入方式與美股相同，每天通常會存入兩篇。
 
@@ -110,7 +110,7 @@ stock-morning-report-line-bot
 └── workflows/                                  <-- 工作流資料夾
     ├── us-news-collector.blueprint.json        <-- Make：美股新聞蒐集 scenario
     ├── tw-news-collector.blueprint.json        <-- Make：台股新聞蒐集 scenario
-    ├── main-push.blueprint.json                <-- Make：推播系統主要 scenario
+    ├── main-push.blueprint.json                <-- Make：推播系統運作 scenario
     └── tw-premarket-report.ifpkg               <-- Dify：LLM 摘要工作流配置
 ```
 
